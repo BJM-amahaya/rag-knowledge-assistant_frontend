@@ -38,10 +38,24 @@ class _UploadDialogState extends ConsumerState<UploadDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(true),
+          onPressed: () => Navigator.of(context).pop(false),
           child: Text('キャンセル'),
         ),
-        ElevatedButton(onPressed: () {}, child: child),
+        ElevatedButton(
+          onPressed: () {
+            final name = _nameController.text;
+            if (name.isEmpty) return;
+            final document = Document(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              name: name,
+              uploadedAt: DateTime.now(),
+              size: 0,
+            );
+            ref.read(documentNotifierProvider.notifier).addDocument(document);
+            Navigator.of(context).pop(true);
+          },
+          child: Text('アップロード'),
+        ),
       ],
     );
   }
