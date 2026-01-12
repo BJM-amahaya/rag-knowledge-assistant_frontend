@@ -2,14 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/providers/chat_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/providers/chat_state.dart';
+import 'package:rag_knowledge_assistant_frontend/features/chat/views/chat_bubble.dart';
 
-class ChatPage extends ConsumerWidget {
+class ChatPage extends ConsumerStatefulWidget {
   const ChatPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends ConsumerState<ChatPage> {
+  final ScrollController _scrollController = ScrollController();
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final chatState = ref.watch(chatNotifierProvider);
     print('チャットステイト__$chatState');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('チャット天早')),
@@ -17,10 +39,11 @@ class ChatPage extends ConsumerWidget {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: chatState.messages.length,
               itemBuilder: (context, index) {
                 final message = chatState.messages[index];
-                return Text(message.content);
+                return ChatBubble(message: message);
               },
             ),
           ),
