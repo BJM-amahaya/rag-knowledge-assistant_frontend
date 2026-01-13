@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/providers/chat_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/providers/chat_state.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/views/chat_bubble.dart';
+import 'package:rag_knowledge_assistant_frontend/features/chat/views/chat_input.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
   const ChatPage({super.key});
@@ -52,7 +53,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               padding: EdgeInsets.all(8.0),
               child: CircularProgressIndicator(),
             ),
-          Text('ここに入力欄'),
+          const ChatInput(),
         ],
       ),
     );
