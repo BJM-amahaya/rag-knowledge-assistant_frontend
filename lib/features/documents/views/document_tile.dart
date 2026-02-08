@@ -7,9 +7,12 @@ class DocumentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sizeText = document.size >= 1048576
-        ? '${(document.size / 1048576).toStringAsFixed(1)}MB'
-        : '${(document.size / 1024).toStringAsFixed(1)}KB';
+    final size = document.size;
+    final sizeText = size != null
+        ? (size >= 1048576
+            ? '${(size / 1048576).toStringAsFixed(1)}MB'
+            : '${(size / 1024).toStringAsFixed(1)}KB')
+        : null;
 
     return Card(
       color: Colors.blue.shade300, //後で調整
@@ -34,7 +37,7 @@ class DocumentTile extends StatelessWidget {
                 ],
               ),
             ),
-            Text(sizeText),
+            if (sizeText != null) Text(sizeText),
           ],
         ),
       ),
