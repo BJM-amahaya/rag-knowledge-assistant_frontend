@@ -22,6 +22,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       content: response.message,
       isUser: false,
       timestamp: DateTime.now(),
+      sources: response.sources,
     );
     state = state.copyWith(
       messages: [...state.messages, aiMessage],

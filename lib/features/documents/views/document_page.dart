@@ -9,25 +9,63 @@ class DocumentPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: Text('ドキュメント')),
+      appBar: AppBar(title: const Text('ドキュメント')),
       body: ref
           .watch(documentsProvider)
           .when(
-            loading: () => CircularProgressIndicator(),
-            error: (err, stack) => Text('アップロードに失敗しました。'),
-            data: (documents) => ListView.builder(
-              itemCount: documents.length,
-              itemBuilder: (context, index) {
-                return DocumentTile(document: documents[index]);
-              },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(
+              child: Text(
+                'エラーが発生しました: $err',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
             ),
+            data: (documents) {
+              if (documents.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.description_outlined,
+                        size: 64,
+                        color: theme.colorScheme.outline,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'ドキュメントをアップロードしましょう',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '右下の + ボタンから\n追加できます',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return ListView.builder(
+                itemCount: documents.length,
+                itemBuilder: (context, index) {
+                  return DocumentTile(document: documents[index]);
+                },
+              );
+            },
           ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(context: context, builder: (context) => UploadDialog());
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
