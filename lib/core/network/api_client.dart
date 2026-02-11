@@ -9,7 +9,12 @@ class ApiClient {
           baseUrl: EnvConfig.apiBaseUrl,
           connectTimeout: Duration(seconds: 5),
         ),
-      );
+      ) {
+    _dio.interceptors.add(LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+    ));
+  }
   Future<Response> get(String path) async {
     return await _dio.get(path);
   }

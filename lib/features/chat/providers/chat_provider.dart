@@ -1,10 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rag_knowledge_assistant_frontend/services/mock_chat_service.dart';
+import 'package:rag_knowledge_assistant_frontend/core/config/env_config.dart';
+import 'package:rag_knowledge_assistant_frontend/core/network/api_client.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/models/chat_message.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/providers/chat_state.dart';
+import 'package:rag_knowledge_assistant_frontend/services/api_chat_service.dart';
+import 'package:rag_knowledge_assistant_frontend/services/chat_service.dart';
+import 'package:rag_knowledge_assistant_frontend/services/mock_chat_service.dart';
+
+final chatServiceProvider = Provider<ChatService>((ref) {
+  if (EnvConfig.useMock) {
+    return MockChatService();
+  } else {
+    return ApiChatService(ApiClient());
+  }
+});
 
 class ChatNotifier extends StateNotifier<ChatState> {
-  final MockChatService _service;
+  final ChatService _service;
   ChatNotifier(this._service) : super(ChatState.initial());
   Future<void> sendMessage(String content) async {
     final userMessage = ChatMessage(
@@ -34,5 +46,5 @@ class ChatNotifier extends StateNotifier<ChatState> {
 final chatNotifierProvider = StateNotifierProvider<ChatNotifier, ChatState>((
   ref,
 ) {
-  return ChatNotifier(MockChatService());
+  return ChatNotifier(ref.watch(chatServiceProvider));
 });
