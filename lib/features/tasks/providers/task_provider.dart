@@ -55,7 +55,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
     state = state.copyWith(
       isProcessing: true,
       progressSteps: [],
-      currentStep: null,
+      clearCurrentStep: true,
     );
 
     try {
@@ -70,7 +70,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
         } else if (progress.type == 'complete') {
           state = state.copyWith(
             isProcessing: false,
-            currentStep: null,
+            clearCurrentStep: true,
           );
         }
       }
@@ -98,7 +98,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
     state = state.copyWith(
       progressSteps: [],
       isProcessing: false,
-      currentStep: null,
+      clearCurrentStep: true,
     );
   }
 

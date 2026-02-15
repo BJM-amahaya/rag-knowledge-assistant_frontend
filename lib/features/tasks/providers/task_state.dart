@@ -36,17 +36,19 @@ class TaskState {
     List<Task>? tasks,
     bool? isLoading,
     String? errorMessage,
+    bool clearErrorMessage = false,
     List<AgentProgress>? progressSteps,
     bool? isProcessing,
     String? currentStep,
+    bool clearCurrentStep = false,
   }) {
     return TaskState(
       tasks: tasks ?? this.tasks,
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
       progressSteps: progressSteps ?? this.progressSteps,
       isProcessing: isProcessing ?? this.isProcessing,
-      currentStep: currentStep ?? this.currentStep,
+      currentStep: clearCurrentStep ? null : (currentStep ?? this.currentStep),
     );
   }
 }
