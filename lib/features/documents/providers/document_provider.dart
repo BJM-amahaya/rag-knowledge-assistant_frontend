@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rag_knowledge_assistant_frontend/core/config/env_config.dart';
 import 'package:rag_knowledge_assistant_frontend/core/network/api_client.dart';
@@ -39,6 +41,21 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   Future<void> addDocument(Document document) async {
     final updatedList = [...state.documents, document];
     state = state.copyWith(documents: updatedList);
+  }
+
+  Future<void> uploadDocument(Uint8List fileBytes, String fileName) async {
+    state = state.copyWith(isUploading: true, errorMessage: null);
+    try {
+      final document = await _service.uploadDocument(fileBytes, fileName);
+      final updatedList = [...state.documents, document];
+      state = state.copyWith(documents: updatedList, isUploading: false);
+    } catch (e) {
+      state = state.copyWith(
+        isUploading: false,
+        errorMessage: e.toString(),
+      );
+      rethrow;
+    }
   }
 
   Future<void> deleteDocument(String id) async {

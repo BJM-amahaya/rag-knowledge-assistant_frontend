@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:rag_knowledge_assistant_frontend/core/network/api_client.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/models/document.dart';
@@ -16,9 +18,9 @@ class ApiDocumentService implements DocumentService {
   }
 
   @override
-  Future<Document> uploadDocument(String filePath, String fileName) async {
+  Future<Document> uploadDocument(Uint8List fileBytes, String fileName) async {
     final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(filePath, filename: fileName),
+      'file': MultipartFile.fromBytes(fileBytes, filename: fileName),
     });
     final response = await _apiClient.post('/documents', formData);
     return Document.fromJson(response.data);

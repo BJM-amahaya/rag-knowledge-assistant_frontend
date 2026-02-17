@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:rag_knowledge_assistant_frontend/features/documents/models/document.dart';
 import 'package:rag_knowledge_assistant_frontend/services/document_service.dart';
 
@@ -27,7 +29,7 @@ class MockDocumentService implements DocumentService {
 
   // アップロード（成功したフリをする）
   @override
-  Future<Document> uploadDocument(String filePath, String fileName) async {
+  Future<Document> uploadDocument(Uint8List fileBytes, String fileName) async {
     await Future.delayed(Duration(seconds: 1));
     // 新しいドキュメントを追加して返す
     final newDocument = Document(
