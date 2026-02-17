@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/models/chat_message.dart';
 
 class ChatBubble extends StatelessWidget {
@@ -16,10 +17,9 @@ class ChatBubble extends StatelessWidget {
       child: GestureDetector(
         onLongPress: () {
           Clipboard.setData(ClipboardData(text: message.content));
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('コピーしました'),
-              duration: Duration(seconds: 1),
+          ShadSonner.of(context).show(
+            const ShadToast(
+              title: Text('コピーしました'),
             ),
           );
         },
@@ -66,7 +66,7 @@ class ChatBubble extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.attach_file,
+                          LucideIcons.paperclip,
                           size: 14,
                           color: theme.colorScheme.primary,
                         ),

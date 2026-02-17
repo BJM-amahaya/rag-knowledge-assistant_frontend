@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class LoadingIndicator extends StatelessWidget {
   final String? message;
-  const LoadingIndicator({this.message});
+  const LoadingIndicator({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -10,10 +11,13 @@ class LoadingIndicator extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircularProgressIndicator(),
+          const SizedBox(
+            width: 200,
+            child: ShadProgress(),
+          ),
           if (message != null)
             Padding(
-              padding: EdgeInsetsGeometry.only(top: 16),
+              padding: const EdgeInsets.only(top: 16),
               child: Text(message!),
             ),
         ],

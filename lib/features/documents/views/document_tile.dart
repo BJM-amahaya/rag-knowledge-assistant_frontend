@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/models/document.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/providers/document_provider.dart';
 
@@ -21,26 +22,31 @@ class DocumentTile extends ConsumerWidget {
       key: ValueKey(document.id),
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
-        return await showDialog<bool>(
+        bool? result;
+        await showShadDialog(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) => ShadDialog.alert(
             title: const Text('削除確認'),
-            content: Text('「${document.name}」を削除しますか？'),
+            description: Text('「${document.name}」を削除しますか？'),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
+              ShadButton.outline(
                 child: const Text('キャンセル'),
+                onPressed: () {
+                  result = false;
+                  Navigator.of(context).pop();
+                },
               ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(
-                  '削除',
-                  style: TextStyle(color: theme.colorScheme.error),
-                ),
+              ShadButton.destructive(
+                child: const Text('削除'),
+                onPressed: () {
+                  result = true;
+                  Navigator.of(context).pop();
+                },
               ),
             ],
           ),
         );
+        return result ?? false;
       },
       onDismissed: (_) {
         ref.read(documentNotifierProvider.notifier).deleteDocument(document.id);
@@ -50,17 +56,17 @@ class DocumentTile extends ConsumerWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         color: theme.colorScheme.error,
-        child: Icon(Icons.delete, color: theme.colorScheme.onError),
+        child: Icon(LucideIcons.trash2, color: theme.colorScheme.onError),
       ),
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Padding(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: ShadCard(
           padding: const EdgeInsets.all(12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(
-                Icons.text_snippet_outlined,
+                LucideIcons.fileText,
                 size: 20,
                 color: theme.colorScheme.primary,
               ),

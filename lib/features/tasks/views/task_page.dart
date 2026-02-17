@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/models/task.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/providers/task_provider.dart';
 
@@ -38,14 +39,18 @@ class _TaskPageState extends ConsumerState<TaskPage> {
 
   Widget _buildBody(ThemeData theme, taskState) {
     if (taskState.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: SizedBox(width: 200, child: ShadProgress()),
+      );
     }
 
     if (taskState.errorMessage != null) {
-      return Center(
-        child: Text(
-          'エラー: ${taskState.errorMessage}',
-          style: TextStyle(color: theme.colorScheme.error),
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: ShadAlert.destructive(
+          icon: const Icon(LucideIcons.triangleAlert),
+          title: const Text('エラー'),
+          description: Text('${taskState.errorMessage}'),
         ),
       );
     }
@@ -56,7 +61,7 @@ class _TaskPageState extends ConsumerState<TaskPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.task_alt,
+              LucideIcons.listChecks,
               size: 64,
               color: theme.colorScheme.outline,
             ),
@@ -91,33 +96,41 @@ class _TaskPageState extends ConsumerState<TaskPage> {
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
             color: theme.colorScheme.error,
-            child: const Icon(Icons.delete, color: Colors.white),
+            child: const Icon(LucideIcons.trash2, color: Colors.white),
           ),
           confirmDismiss: (direction) async {
-            return await showDialog<bool>(
+            bool? result;
+            await showShadDialog(
               context: context,
-              builder: (context) => AlertDialog(
+              builder: (context) => ShadDialog.alert(
                 title: const Text('削除確認'),
-                content: const Text('このタスクを削除しますか？'),
+                description: const Text('このタスクを削除しますか？'),
                 actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
+                  ShadButton.outline(
                     child: const Text('キャンセル'),
+                    onPressed: () {
+                      result = false;
+                      Navigator.pop(context);
+                    },
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
+                  ShadButton.destructive(
                     child: const Text('削除'),
+                    onPressed: () {
+                      result = true;
+                      Navigator.pop(context);
+                    },
                   ),
                 ],
               ),
             );
+            return result ?? false;
           },
           onDismissed: (_) {
             ref.read(taskNotifierProvider.notifier).deleteTask(task.id);
           },
           child: ListTile(
             leading: Icon(
-              Icons.task_alt,
+              LucideIcons.listChecks,
               color: task.status == 'completed'
                   ? Colors.green
                   : theme.colorScheme.primary,
@@ -131,7 +144,7 @@ class _TaskPageState extends ConsumerState<TaskPage> {
               _formatSubtitle(task),
               style: theme.textTheme.bodySmall,
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: const Icon(LucideIcons.chevronRight),
             onTap: () => context.go('/tasks/${task.id}'),
           ),
         );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/providers/document_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/views/document_tile.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/views/upload_dialog.dart';
@@ -16,11 +17,15 @@ class DocumentPage extends ConsumerWidget {
       body: ref
           .watch(documentsProvider)
           .when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(
-              child: Text(
-                'エラーが発生しました: $err',
-                style: TextStyle(color: theme.colorScheme.error),
+            loading: () => const Center(
+              child: SizedBox(width: 200, child: ShadProgress()),
+            ),
+            error: (err, stack) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: ShadAlert.destructive(
+                icon: const Icon(LucideIcons.triangleAlert),
+                title: const Text('エラーが発生しました'),
+                description: Text('$err'),
               ),
             ),
             data: (documents) {
@@ -30,7 +35,7 @@ class DocumentPage extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.description_outlined,
+                        LucideIcons.fileText,
                         size: 64,
                         color: theme.colorScheme.outline,
                       ),
@@ -63,7 +68,10 @@ class DocumentPage extends ConsumerWidget {
           ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(context: context, builder: (context) => UploadDialog());
+          showShadDialog(
+            context: context,
+            builder: (context) => const UploadDialog(),
+          );
         },
         child: const Icon(Icons.add),
       ),

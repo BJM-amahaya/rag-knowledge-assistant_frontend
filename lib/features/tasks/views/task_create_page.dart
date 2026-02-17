@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/models/agent_progress.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/providers/task_provider.dart';
 
@@ -45,24 +46,21 @@ class _TaskCreatePageState extends ConsumerState<TaskCreatePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 入力エリア
-            TextField(
+            ShadTextarea(
               controller: _controller,
-              decoration: const InputDecoration(
-                labelText: 'タスクの内容',
-                hintText: '例: ECサイトの開発',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
+              placeholder: const Text('例: ECサイトの開発'),
+              minHeight: 80,
+              maxHeight: 150,
               enabled: !_hasStarted,
             ),
             const SizedBox(height: 16),
 
             // 分析開始ボタン
             if (!_hasStarted)
-              ElevatedButton.icon(
+              ShadButton(
+                leading: const Icon(LucideIcons.sparkles),
                 onPressed: _startAnalysis,
-                icon: const Icon(Icons.auto_awesome),
-                label: const Text('AI分析を開始'),
+                child: const Text('AI分析を開始'),
               ),
 
             const SizedBox(height: 24),
@@ -83,14 +81,14 @@ class _TaskCreatePageState extends ConsumerState<TaskCreatePage> {
             if (_hasStarted && !taskState.isProcessing)
               Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: ElevatedButton.icon(
+                child: ShadButton(
+                  leading: const Icon(LucideIcons.check),
                   onPressed: () {
                     ref.read(taskNotifierProvider.notifier).resetProgress();
                     ref.read(taskNotifierProvider.notifier).fetchTasks();
                     context.go('/tasks');
                   },
-                  icon: const Icon(Icons.check),
-                  label: const Text('タスク一覧に戻る'),
+                  child: const Text('タスク一覧に戻る'),
                 ),
               ),
           ],
@@ -118,13 +116,13 @@ class _TaskCreatePageState extends ConsumerState<TaskCreatePage> {
         IconData icon;
         Color iconColor;
         if (isCompleted) {
-          icon = Icons.check_circle;
+          icon = LucideIcons.circleCheck;
           iconColor = Colors.green;
         } else if (isCurrent) {
-          icon = Icons.hourglass_top;
+          icon = LucideIcons.hourglass;
           iconColor = theme.colorScheme.primary;
         } else {
-          icon = Icons.circle_outlined;
+          icon = LucideIcons.circle;
           iconColor = theme.colorScheme.outline;
         }
 

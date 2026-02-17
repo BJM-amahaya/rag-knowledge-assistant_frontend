@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/providers/chat_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/views/chat_bubble.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/views/chat_input.dart';
@@ -45,7 +46,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.chat_bubble_outline,
+                          LucideIcons.messageCircle,
                           size: 64,
                           color: theme.colorScheme.outline,
                         ),
@@ -79,7 +80,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           if (chatState.isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(),
+              child: SizedBox(width: 200, child: ShadProgress()),
             ),
           const ChatInput(),
         ],

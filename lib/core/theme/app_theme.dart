@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class AppTheme {
   static const Color primaryColor = Color(0xFF6750A4);
-  static ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-      colorSchemeSeed: primaryColor,
+
+  static ShadThemeData get lightShadTheme {
+    return ShadThemeData(
+      colorScheme: const ShadVioletColorScheme.light(),
       brightness: Brightness.light,
     );
   }
 
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      colorSchemeSeed: primaryColor,
+  static ShadThemeData get darkShadTheme {
+    return ShadThemeData(
+      colorScheme: const ShadVioletColorScheme.dark(),
       brightness: Brightness.dark,
     );
   }

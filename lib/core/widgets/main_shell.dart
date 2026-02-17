@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -17,14 +18,19 @@ class MainShell extends StatelessWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.description),
+            icon: Icon(LucideIcons.fileText),
             label: 'ドキュメント',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'チャット'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.task_alt), label: 'タスク'),
+            icon: Icon(LucideIcons.messageCircle),
+            label: 'チャット',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.listChecks),
+            label: 'タスク',
+          ),
         ],
         currentIndex: currentIndex,
         onTap: (index) {

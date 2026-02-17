@@ -34,6 +34,7 @@ dependencies:
   go_router: ^12.0.0
   freezed_annotation: ^2.4.0
   web_socket_channel: ^3.0.0
+  shadcn_ui: ^0.46.1
 
   flutter:
     sdk: flutter

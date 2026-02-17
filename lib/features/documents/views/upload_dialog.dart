@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/models/document.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/providers/document_provider.dart';
 
@@ -12,7 +13,6 @@ class UploadDialog extends ConsumerStatefulWidget {
 
 class _UploadDialogState extends ConsumerState<UploadDialog> {
   final _nameController = TextEditingController();
-  bool _isUploading = false;
 
   @override
   void dispose() {
@@ -22,26 +22,17 @@ class _UploadDialogState extends ConsumerState<UploadDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('ドキュメントアップロード'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _nameController,
-            decoration: InputDecoration(
-              labelText: 'サンプルファイル',
-              hintText: 'サンプル.pdf',
-            ),
-          ),
-        ],
-      ),
+    return ShadDialog(
+      title: const Text('ドキュメントアップロード'),
+      description: const Text('アップロードするファイル名を入力してください'),
       actions: [
-        TextButton(
+        ShadButton.outline(
+          child: const Text('キャンセル'),
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text('キャンセル'),
         ),
-        ElevatedButton(
+        ShadButton(
+          leading: const Icon(LucideIcons.upload),
+          child: const Text('アップロード'),
           onPressed: () {
             final name = _nameController.text;
             if (name.isEmpty) return;
@@ -54,9 +45,15 @@ class _UploadDialogState extends ConsumerState<UploadDialog> {
             ref.read(documentNotifierProvider.notifier).addDocument(document);
             Navigator.of(context).pop(true);
           },
-          child: Text('アップロード'),
         ),
       ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: ShadInput(
+          controller: _nameController,
+          placeholder: const Text('サンプル.pdf'),
+        ),
+      ),
     );
   }
 }
