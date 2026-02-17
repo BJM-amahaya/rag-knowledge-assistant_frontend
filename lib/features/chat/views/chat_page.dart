@@ -35,56 +35,53 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       }
     });
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('RAG チャット')),
-      body: Column(
-        children: [
-          Expanded(
-            child: chatState.messages.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          LucideIcons.messageCircle,
-                          size: 64,
+    return Column(
+      children: [
+        Expanded(
+          child: chatState.messages.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        LucideIcons.messageCircle,
+                        size: 64,
+                        color: theme.colorScheme.outline,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        '質問してみましょう！',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'アップロードしたドキュメントについて\nAIに質問できます',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.outline,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          '質問してみましょう！',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'アップロードしたドキュメントについて\nAIに質問できます',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.outline,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    controller: _scrollController,
-                    itemCount: chatState.messages.length,
-                    itemBuilder: (context, index) {
-                      final message = chatState.messages[index];
-                      return ChatBubble(message: message);
-                    },
+                      ),
+                    ],
                   ),
+                )
+              : ListView.builder(
+                  controller: _scrollController,
+                  itemCount: chatState.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = chatState.messages[index];
+                    return ChatBubble(message: message);
+                  },
+                ),
+        ),
+        if (chatState.isLoading)
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: SizedBox(width: 200, child: ShadProgress()),
           ),
-          if (chatState.isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: SizedBox(width: 200, child: ShadProgress()),
-            ),
-          const ChatInput(),
-        ],
-      ),
+        const ChatInput(),
+      ],
     );
   }
 }

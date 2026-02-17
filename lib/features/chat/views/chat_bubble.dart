@@ -45,7 +45,7 @@ class ChatBubble extends StatelessWidget {
             children: [
               Text(
                 message.content,
-                style: TextStyle(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: isUser
                       ? theme.colorScheme.onPrimary
                       : theme.colorScheme.onSurface,
@@ -74,8 +74,7 @@ class ChatBubble extends StatelessWidget {
                         Flexible(
                           child: Text(
                             '${source.documentName} p.${source.page}',
-                            style: TextStyle(
-                              fontSize: 12,
+                            style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.primary,
                             ),
                           ),

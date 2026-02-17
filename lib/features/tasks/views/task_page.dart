@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:rag_knowledge_assistant_frontend/core/theme/app_theme.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/models/task.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/providers/task_provider.dart';
 
@@ -27,14 +28,7 @@ class _TaskPageState extends ConsumerState<TaskPage> {
     final theme = Theme.of(context);
     final taskState = ref.watch(taskNotifierProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('タスク')),
-      body: _buildBody(theme, taskState),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go('/tasks/create'),
-        child: const Icon(Icons.add),
-      ),
-    );
+    return _buildBody(theme, taskState);
   }
 
   Widget _buildBody(ThemeData theme, taskState) {
@@ -49,7 +43,7 @@ class _TaskPageState extends ConsumerState<TaskPage> {
         padding: const EdgeInsets.all(16),
         child: ShadAlert.destructive(
           icon: const Icon(LucideIcons.triangleAlert),
-          title: const Text('エラー'),
+          title: const Text('エラーが発生しました'),
           description: Text('${taskState.errorMessage}'),
         ),
       );
@@ -110,14 +104,14 @@ class _TaskPageState extends ConsumerState<TaskPage> {
                     child: const Text('キャンセル'),
                     onPressed: () {
                       result = false;
-                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                     },
                   ),
                   ShadButton.destructive(
                     child: const Text('削除'),
                     onPressed: () {
                       result = true;
-                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                     },
                   ),
                 ],
@@ -128,24 +122,53 @@ class _TaskPageState extends ConsumerState<TaskPage> {
           onDismissed: (_) {
             ref.read(taskNotifierProvider.notifier).deleteTask(task.id);
           },
-          child: ListTile(
-            leading: Icon(
-              LucideIcons.listChecks,
-              color: task.status == 'completed'
-                  ? Colors.green
-                  : theme.colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: GestureDetector(
+              onTap: () => context.go('/tasks/${task.id}'),
+              child: ShadCard(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      LucideIcons.listChecks,
+                      size: 20,
+                      color: task.status == 'completed'
+                          ? AppTheme.successColor
+                          : theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            task.task,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _formatSubtitle(task),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.outline,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: theme.colorScheme.outline,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            title: Text(
-              task.task,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: Text(
-              _formatSubtitle(task),
-              style: theme.textTheme.bodySmall,
-            ),
-            trailing: const Icon(LucideIcons.chevronRight),
-            onTap: () => context.go('/tasks/${task.id}'),
           ),
         );
       },

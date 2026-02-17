@@ -22,35 +22,29 @@ class TaskDetailPage extends ConsumerWidget {
 
     if (task == null) {
       // 一覧に無い場合はAPIから再取得を試みる
-      return Scaffold(
-        appBar: AppBar(title: const Text('タスク詳細')),
-        body: FutureBuilder<Task>(
-          future: ref.read(taskServiceProvider).getTask(taskId),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: SizedBox(width: 200, child: ShadProgress()),
-              );
-            }
-            if (snapshot.hasError) {
-              return Padding(
-                padding: const EdgeInsets.all(16),
-                child: ShadAlert.destructive(
-                  icon: const Icon(LucideIcons.triangleAlert),
-                  title: const Text('タスクが見つかりません'),
-                ),
-              );
-            }
-            return _buildDetail(context, theme, snapshot.data!);
-          },
-        ),
+      return FutureBuilder<Task>(
+        future: ref.read(taskServiceProvider).getTask(taskId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(width: 200, child: ShadProgress()),
+            );
+          }
+          if (snapshot.hasError) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: ShadAlert.destructive(
+                icon: const Icon(LucideIcons.triangleAlert),
+                title: const Text('タスクが見つかりません'),
+              ),
+            );
+          }
+          return _buildDetail(context, theme, snapshot.data!);
+        },
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('タスク詳細')),
-      body: _buildDetail(context, theme, task),
-    );
+    return _buildDetail(context, theme, task);
   }
 
   Widget _buildDetail(BuildContext context, ThemeData theme, Task task) {
@@ -302,7 +296,7 @@ class TaskDetailPage extends ConsumerWidget {
           dense: true,
           leading: CircleAvatar(
             radius: 16,
-            child: Text('$day', style: const TextStyle(fontSize: 12)),
+            child: Text('$day', style: theme.textTheme.bodySmall),
           ),
           title: Text('Day $day'),
           subtitle: Text(tasks),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:rag_knowledge_assistant_frontend/core/theme/app_theme.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/models/agent_progress.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/providers/task_provider.dart';
 
@@ -38,61 +39,58 @@ class _TaskCreatePageState extends ConsumerState<TaskCreatePage> {
     final theme = Theme.of(context);
     final taskState = ref.watch(taskNotifierProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('タスク作成')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // 入力エリア
-            ShadTextarea(
-              controller: _controller,
-              placeholder: const Text('例: ECサイトの開発'),
-              minHeight: 80,
-              maxHeight: 150,
-              enabled: !_hasStarted,
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 入力エリア
+          ShadTextarea(
+            controller: _controller,
+            placeholder: const Text('例: ECサイトの開発'),
+            minHeight: 80,
+            maxHeight: 150,
+            enabled: !_hasStarted,
+          ),
+          const SizedBox(height: 16),
+
+          // 分析開始ボタン
+          if (!_hasStarted)
+            ShadButton(
+              leading: const Icon(LucideIcons.sparkles),
+              onPressed: _startAnalysis,
+              child: const Text('AI分析を開始'),
             ),
-            const SizedBox(height: 16),
 
-            // 分析開始ボタン
-            if (!_hasStarted)
-              ShadButton(
-                leading: const Icon(LucideIcons.sparkles),
-                onPressed: _startAnalysis,
-                child: const Text('AI分析を開始'),
-              ),
+          const SizedBox(height: 24),
 
-            const SizedBox(height: 24),
-
-            // Agent 進捗表示
-            if (_hasStarted) ...[
-              Text(
-                'AI Agent 処理状況',
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: _buildProgressList(theme, taskState),
-              ),
-            ],
-
-            // 完了後のボタン
-            if (_hasStarted && !taskState.isProcessing)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: ShadButton(
-                  leading: const Icon(LucideIcons.check),
-                  onPressed: () {
-                    ref.read(taskNotifierProvider.notifier).resetProgress();
-                    ref.read(taskNotifierProvider.notifier).fetchTasks();
-                    context.go('/tasks');
-                  },
-                  child: const Text('タスク一覧に戻る'),
-                ),
-              ),
+          // Agent 進捗表示
+          if (_hasStarted) ...[
+            Text(
+              'AI Agent 処理状況',
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: _buildProgressList(theme, taskState),
+            ),
           ],
-        ),
+
+          // 完了後のボタン
+          if (_hasStarted && !taskState.isProcessing)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: ShadButton(
+                leading: const Icon(LucideIcons.check),
+                onPressed: () {
+                  ref.read(taskNotifierProvider.notifier).resetProgress();
+                  ref.read(taskNotifierProvider.notifier).fetchTasks();
+                  context.go('/tasks');
+                },
+                child: const Text('タスク一覧に戻る'),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -117,7 +115,7 @@ class _TaskCreatePageState extends ConsumerState<TaskCreatePage> {
         Color iconColor;
         if (isCompleted) {
           icon = LucideIcons.circleCheck;
-          iconColor = Colors.green;
+          iconColor = AppTheme.successColor;
         } else if (isCurrent) {
           icon = LucideIcons.hourglass;
           iconColor = theme.colorScheme.primary;
@@ -136,21 +134,21 @@ class _TaskCreatePageState extends ConsumerState<TaskCreatePage> {
               : Icon(icon, color: iconColor),
           title: Text(
             '${index + 1}. $label',
-            style: TextStyle(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight:
                   isCompleted || isCurrent ? FontWeight.bold : FontWeight.normal,
               color: isCompleted
-                  ? Colors.green
+                  ? AppTheme.successColor
                   : isCurrent
                       ? theme.colorScheme.primary
                       : theme.colorScheme.onSurface,
             ),
           ),
           subtitle: isCompleted
-              ? Text('完了', style: TextStyle(color: Colors.green))
+              ? Text('完了', style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.successColor))
               : isCurrent
-                  ? Text('処理中...', style: TextStyle(color: theme.colorScheme.primary))
-                  : Text('待機中', style: TextStyle(color: theme.colorScheme.outline)),
+                  ? Text('処理中...', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary))
+                  : Text('待機中', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline)),
         );
       },
     );
