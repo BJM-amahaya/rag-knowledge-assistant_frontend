@@ -11,10 +11,12 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     int currentIndex = 0;
-    if (location.startsWith('/chat')) {
+    if (location.startsWith('/documents')) {
       currentIndex = 1;
-    } else if (location.startsWith('/tasks')) {
+    } else if (location.startsWith('/chat')) {
       currentIndex = 2;
+    } else if (location.startsWith('/tasks')) {
+      currentIndex = 3;
     }
 
     final title = _getTitle(location);
@@ -33,7 +35,12 @@ class MainShell extends StatelessWidget {
       ),
       body: child,
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: const [
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.house),
+            label: 'ホーム',
+          ),
           BottomNavigationBarItem(
             icon: Icon(LucideIcons.fileText),
             label: 'ドキュメント',
@@ -51,12 +58,15 @@ class MainShell extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              context.go('/documents');
+              context.go('/home');
               break;
             case 1:
-              context.go('/chat');
+              context.go('/documents');
               break;
             case 2:
+              context.go('/chat');
+              break;
+            case 3:
               context.go('/tasks');
               break;
           }
@@ -81,6 +91,7 @@ class MainShell extends StatelessWidget {
   }
 
   String _getTitle(String location) {
+    if (location == '/home') return 'ナレッジアシスタント';
     if (location == '/documents') return 'ドキュメント';
     if (location == '/chat') return 'RAG チャット';
     if (location == '/tasks/create') return 'タスク作成';
