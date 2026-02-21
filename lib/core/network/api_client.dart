@@ -7,7 +7,9 @@ class ApiClient {
     : _dio = Dio(
         BaseOptions(
           baseUrl: EnvConfig.apiBaseUrl,
-          connectTimeout: Duration(seconds: 5),
+          connectTimeout: Duration(seconds: 10),
+          receiveTimeout: Duration(minutes: 5),
+          sendTimeout: Duration(minutes: 2),
         ),
       ) {
     _dio.interceptors.add(LogInterceptor(
