@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:rag_knowledge_assistant_frontend/features/chat/providers/chat_provider.dart';
 
 class ChatInput extends ConsumerStatefulWidget {
@@ -28,17 +29,24 @@ class _ChatInputState extends ConsumerState<ChatInput> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
           Expanded(
-            child: TextField(
+            child: ShadInput(
               controller: _controller,
               onSubmitted: (_) => _sendMessage(),
-              decoration: const InputDecoration(hintText: 'メッセージを入力....'),
+              placeholder: const Text('メッセージを入力....'),
             ),
           ),
-          IconButton(icon: const Icon(Icons.send), onPressed: _sendMessage),
+          const SizedBox(width: 8),
+          ShadButton.outline(
+            width: 40,
+            height: 40,
+            padding: EdgeInsets.zero,
+            leading: const Icon(LucideIcons.send, size: 18),
+            onPressed: _sendMessage,
+          ),
         ],
       ),
     );

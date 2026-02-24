@@ -1,0 +1,156 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:rag_knowledge_assistant_frontend/core/theme/app_theme.dart';
+import 'package:rag_knowledge_assistant_frontend/features/tasks/models/agent_progress.dart';
+import 'package:rag_knowledge_assistant_frontend/features/tasks/providers/task_provider.dart';
+
+class TaskCreatePage extends ConsumerStatefulWidget {
+  const TaskCreatePage({super.key});
+
+  @override
+  ConsumerState<TaskCreatePage> createState() => _TaskCreatePageState();
+}
+
+class _TaskCreatePageState extends ConsumerState<TaskCreatePage> {
+  final _controller = TextEditingController();
+  bool _hasStarted = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _startAnalysis() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() => _hasStarted = true);
+
+    // ユニークなID（タイムスタンプベース）
+    final taskId = DateTime.now().millisecondsSinceEpoch.toString();
+    ref.read(taskNotifierProvider.notifier).startStreaming(taskId, text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final taskState = ref.watch(taskNotifierProvider);
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 入力エリア
+          ShadTextarea(
+            controller: _controller,
+            placeholder: const Text('例: ECサイトの開発'),
+            minHeight: 80,
+            maxHeight: 150,
+            enabled: !_hasStarted,
+          ),
+          const SizedBox(height: 16),
+
+          // 分析開始ボタン
+          if (!_hasStarted)
+            ShadButton(
+              leading: const Icon(LucideIcons.sparkles),
+              onPressed: _startAnalysis,
+              child: const Text('AI分析を開始'),
+            ),
+
+          const SizedBox(height: 24),
+
+          // Agent 進捗表示
+          if (_hasStarted) ...[
+            Text(
+              'AI Agent 処理状況',
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: _buildProgressList(theme, taskState),
+            ),
+          ],
+
+          // 完了後のボタン
+          if (_hasStarted && !taskState.isProcessing)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: ShadButton(
+                leading: const Icon(LucideIcons.check),
+                onPressed: () {
+                  ref.read(taskNotifierProvider.notifier).resetProgress();
+                  ref.read(taskNotifierProvider.notifier).fetchTasks();
+                  context.go('/tasks');
+                },
+                child: const Text('タスク一覧に戻る'),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressList(ThemeData theme, taskState) {
+    final completedAgents = <String>{};
+    for (final step in taskState.progressSteps) {
+      final name = step.agentName;
+      if (name != null) completedAgents.add(name);
+    }
+
+    return ListView.builder(
+      itemCount: AgentProgress.agentOrder.length,
+      itemBuilder: (context, index) {
+        final agentKey = AgentProgress.agentOrder[index];
+        final label =
+            AgentProgress.agentLabels[agentKey] ?? agentKey;
+        final isCompleted = completedAgents.contains(agentKey);
+        final isCurrent = taskState.currentStep == agentKey;
+
+        IconData icon;
+        Color iconColor;
+        if (isCompleted) {
+          icon = LucideIcons.circleCheck;
+          iconColor = AppTheme.successColor;
+        } else if (isCurrent) {
+          icon = LucideIcons.hourglass;
+          iconColor = theme.colorScheme.primary;
+        } else {
+          icon = LucideIcons.circle;
+          iconColor = theme.colorScheme.outline;
+        }
+
+        return ListTile(
+          leading: isCurrent
+              ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(icon, color: iconColor),
+          title: Text(
+            '${index + 1}. $label',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight:
+                  isCompleted || isCurrent ? FontWeight.bold : FontWeight.normal,
+              color: isCompleted
+                  ? AppTheme.successColor
+                  : isCurrent
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+            ),
+          ),
+          subtitle: isCompleted
+              ? Text('完了', style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.successColor))
+              : isCurrent
+                  ? Text('処理中...', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary))
+                  : Text('待機中', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline)),
+        );
+      },
+    );
+  }
+}
