@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:rag_knowledge_assistant_frontend/features/documents/providers/document_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/views/upload_dialog.dart';
 
-class EmptyHomeState extends StatelessWidget {
+class EmptyHomeState extends ConsumerWidget {
   const EmptyHomeState({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Padding(
@@ -37,11 +39,14 @@ class EmptyHomeState extends StatelessWidget {
             child: ShadButton(
               leading: const Icon(LucideIcons.upload),
               size: ShadButtonSize.lg,
-              onPressed: () {
-                showShadDialog(
+              onPressed: () async {
+                final result = await showShadDialog<bool>(
                   context: context,
                   builder: (context) => const UploadDialog(),
                 );
+                if (result == true) {
+                  ref.invalidate(documentsProvider);
+                }
               },
               child: const Text('最初のドキュメントをアップロードする'),
             ),
