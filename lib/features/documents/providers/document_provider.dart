@@ -61,6 +61,7 @@ class DocumentNotifier extends StateNotifier<DocumentState> {
   Future<void> deleteDocument(String id) async {
     final updatedList = state.documents.where((doc) => doc.id != id).toList();
     state = state.copyWith(documents: updatedList);
+    await _service.deleteDocument(id);
   }
 }
 

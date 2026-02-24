@@ -48,8 +48,8 @@ class DocumentTile extends ConsumerWidget {
         );
         return result ?? false;
       },
-      onDismissed: (_) {
-        ref.read(documentNotifierProvider.notifier).deleteDocument(document.id);
+      onDismissed: (_) async {
+        await ref.read(documentNotifierProvider.notifier).deleteDocument(document.id);
         ref.invalidate(documentsProvider);
       },
       background: Container(
