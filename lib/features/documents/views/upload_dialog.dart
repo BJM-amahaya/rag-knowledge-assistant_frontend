@@ -58,7 +58,6 @@ class _UploadDialogState extends ConsumerState<UploadDialog> {
           .uploadDocument(fileBytes, _selectedFile!.name);
 
       if (mounted) {
-        ref.invalidate(documentsProvider);
         Navigator.of(context).pop(true);
       }
     } catch (e) {

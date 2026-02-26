@@ -103,16 +103,22 @@ class MockWebSocketService implements WebSocketService {
         'scheduler': {
           'schedule': [
             {
-              'day': 1,
-              'tasks': ['要件整理'],
+              'subtask_id': 'subtask_1',
+              'scheduled_date': '2026-02-26',
+              'scheduled_time': '09:00',
+              'duration_minutes': 120,
             },
             {
-              'day': 2,
-              'tasks': ['設計'],
+              'subtask_id': 'subtask_2',
+              'scheduled_date': '2026-02-27',
+              'scheduled_time': '09:00',
+              'duration_minutes': 240,
             },
             {
-              'day': 3,
-              'tasks': ['実装'],
+              'subtask_id': 'subtask_3',
+              'scheduled_date': '2026-02-28',
+              'scheduled_time': '09:00',
+              'duration_minutes': 480,
             },
           ],
           'total_days': 3,

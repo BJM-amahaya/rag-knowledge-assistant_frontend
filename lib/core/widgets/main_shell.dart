@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:rag_knowledge_assistant_frontend/features/documents/providers/document_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/views/upload_dialog.dart';
 
-class MainShell extends StatelessWidget {
+class MainShell extends ConsumerWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final location = GoRouterState.of(context).uri.toString();
     int currentIndex = 0;
     if (location.startsWith('/documents')) {
@@ -74,12 +76,15 @@ class MainShell extends StatelessWidget {
       ),
       floatingActionButton: showFab
           ? FloatingActionButton(
-              onPressed: () {
+              onPressed: () async {
                 if (location == '/documents') {
-                  showShadDialog(
+                  final result = await showShadDialog<bool>(
                     context: context,
                     builder: (context) => const UploadDialog(),
                   );
+                  if (result == true) {
+                    ref.invalidate(documentsProvider);
+                  }
                 } else {
                   context.go('/tasks/create');
                 }
