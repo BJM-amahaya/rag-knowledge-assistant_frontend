@@ -159,7 +159,7 @@ class TaskDetailPage extends ConsumerWidget {
                       Text('スケジュール', style: theme.textTheme.titleMedium),
                     ],
                   ),
-                  child: _buildSchedule(theme, task.schedule!),
+                  child: _buildSchedule(theme, task.schedule!, task.subtasks),
                 ),
 
               // 警告
@@ -182,6 +182,16 @@ class TaskDetailPage extends ConsumerWidget {
     );
   }
 
+  static const _analysisLabelMap = <String, String>{
+    'category': 'カテゴリ',
+    'purpose': '目的',
+    'urgency': '緊急度',
+    'complexity': '複雑さ',
+    'key_requirements': '主要な要件',
+    'key_requirement': '主要な要件',
+    'constraints': '制約条件',
+  };
+
   Widget _buildAnalysis(ThemeData theme, Map<String, dynamic> analysis) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,6 +203,7 @@ class TaskDetailPage extends ConsumerWidget {
         } else {
           displayValue = value.toString();
         }
+        final label = _analysisLabelMap[entry.key] ?? entry.key;
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Row(
@@ -201,7 +212,7 @@ class TaskDetailPage extends ConsumerWidget {
               SizedBox(
                 width: 120,
                 child: Text(
-                  entry.key,
+                  label,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -286,7 +297,16 @@ class TaskDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSchedule(ThemeData theme, List<dynamic> schedule) {
+  Widget _buildSchedule(
+      ThemeData theme, List<dynamic> schedule, List<dynamic>? subtasks) {
+    // バックエンド形式（scheduled_date あり）か判定
+    if (schedule.isNotEmpty &&
+        (schedule.first as Map<String, dynamic>)
+            .containsKey('scheduled_date')) {
+      return _buildBackendSchedule(theme, schedule, subtasks);
+    }
+
+    // レガシー形式（day / tasks）── 後方互換
     return Column(
       children: schedule.map((sc) {
         final map = sc as Map<String, dynamic>;
@@ -300,6 +320,95 @@ class TaskDetailPage extends ConsumerWidget {
           ),
           title: Text('Day $day'),
           subtitle: Text(tasks),
+        );
+      }).toList(),
+    );
+  }
+
+  /// バックエンド形式のスケジュールを日付ごとにグループ化して表示
+  Widget _buildBackendSchedule(
+      ThemeData theme, List<dynamic> schedule, List<dynamic>? subtasks) {
+    // subtask_id → タイトルの対応マップを構築
+    final subtaskMap = <String, String>{};
+    if (subtasks != null) {
+      for (final st in subtasks) {
+        final map = st as Map<String, dynamic>;
+        final id = map['id'] as String?;
+        final title = map['title'] as String?;
+        if (id != null) subtaskMap[id] = title ?? id;
+      }
+    }
+
+    // scheduled_date でグループ化（Map は挿入順を保持）
+    final grouped = <String, List<Map<String, dynamic>>>{};
+    for (final sc in schedule) {
+      final map = sc as Map<String, dynamic>;
+      final date = map['scheduled_date'] as String;
+      grouped.putIfAbsent(date, () => []).add(map);
+    }
+
+    final dates = grouped.keys.toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: dates.asMap().entries.map((entry) {
+        final dayNum = entry.key + 1;
+        final date = entry.value;
+        final items = grouped[date]!;
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 日付ヘッダー
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    child:
+                        Text('$dayNum', style: theme.textTheme.bodySmall),
+                  ),
+                  const SizedBox(width: 8),
+                  Text('Day $dayNum',
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 8),
+                  Text('($date)',
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: theme.colorScheme.outline)),
+                ],
+              ),
+              // その日のタスク一覧
+              ...items.map((item) {
+                final subtaskId = item['subtask_id'] as String? ?? '';
+                final title = subtaskMap[subtaskId] ?? subtaskId;
+                final time = item['scheduled_time'] as String? ?? '';
+                final duration = item['duration_minutes'] as int? ?? 0;
+
+                return Padding(
+                  padding: const EdgeInsets.only(left: 40, top: 4),
+                  child: Row(
+                    children: [
+                      if (time.isNotEmpty) ...[
+                        Text(time,
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(width: 8),
+                        const Text('-'),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(child: Text(title)),
+                      if (duration > 0)
+                        Text('(${_formatMinutes(duration)})',
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: theme.colorScheme.outline)),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
         );
       }).toList(),
     );
