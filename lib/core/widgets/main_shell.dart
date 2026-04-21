@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,6 +35,13 @@ class MainShell extends ConsumerWidget {
               )
             : null,
         title: Text(title),
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.logOut),
+            tooltip: 'ログアウト',
+            onPressed: () => _confirmSignOut(context),
+          ),
+        ],
       ),
       body: child,
       bottomNavigationBar: BottomNavigationBar(
@@ -93,6 +101,37 @@ class MainShell extends ConsumerWidget {
             )
           : null,
     );
+  }
+
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final confirmed = await showShadDialog<bool>(
+      context: context,
+      builder: (context) => ShadDialog.alert(
+        title: const Text('ログアウト'),
+        description: const Text('ログアウトしますか？'),
+        actions: [
+          ShadButton.outline(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('キャンセル'),
+          ),
+          ShadButton.destructive(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('ログアウト'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      await Amplify.Auth.signOut();
+    } on AuthException catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
+    }
   }
 
   String _getTitle(String location) {
