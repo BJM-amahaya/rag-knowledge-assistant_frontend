@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:rag_knowledge_assistant_frontend/core/config/env_config.dart';
+import 'package:rag_knowledge_assistant_frontend/core/network/auth_interceptor.dart';
 
 class ApiClient {
   final Dio _dio;
@@ -12,6 +13,7 @@ class ApiClient {
           sendTimeout: Duration(minutes: 2),
         ),
       ) {
+    _dio.interceptors.add(AuthInterceptor());
     _dio.interceptors.add(LogInterceptor(
       requestBody: true,
       responseBody: true,
