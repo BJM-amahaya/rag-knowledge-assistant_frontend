@@ -31,8 +31,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('パスワードが一致しません')),
+      ShadSonner.of(context).show(
+        const ShadToast(title: Text('パスワードが一致しません')),
       );
       return;
     }
@@ -52,8 +52,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       if (!mounted) return;
 
       if (result.isSignUpComplete) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('登録が完了しました。ログインしてください。')),
+        ShadSonner.of(context).show(
+          const ShadToast(title: Text('登録が完了しました。ログインしてください。')),
         );
         context.go('/login');
       } else {
@@ -61,8 +61,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       }
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
+        ShadSonner.of(context).show(
+          ShadToast(title: Text(e.message)),
         );
       }
     } finally {

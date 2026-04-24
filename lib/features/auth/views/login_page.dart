@@ -23,6 +23,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
+  Password did not conform with policy:Password
+  must have symbol characters
+
   Future<void> _signIn() async {
     setState(() => _isLoading = true);
     try {
@@ -35,8 +38,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       }
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
+        ShadSonner.of(context).show(
+          ShadToast(title: Text(e.message)),
         );
       }
     } finally {

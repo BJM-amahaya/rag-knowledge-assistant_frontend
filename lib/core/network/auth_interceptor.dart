@@ -19,6 +19,14 @@ class AuthInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     } catch (e) {
       debugPrint('トークン取得エラー: $e');
+      return handler.reject(
+        DioException(
+          requestOptions: options,
+          type: DioExceptionType.cancel,
+          error: e,
+          message: '未ログインのためリクエストを中止しました',
+        ),
+      );
     }
 
     handler.next(options);

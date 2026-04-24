@@ -26,8 +26,8 @@ class _ConfirmSignupPageState extends ConsumerState<ConfirmSignupPage> {
   Future<void> _confirm() async {
     final code = _codeController.text.trim();
     if (code.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('確認コードを入力してください')),
+      ShadSonner.of(context).show(
+        const ShadToast(title: Text('確認コードを入力してください')),
       );
       return;
     }
@@ -42,15 +42,15 @@ class _ConfirmSignupPageState extends ConsumerState<ConfirmSignupPage> {
       if (!mounted) return;
 
       if (result.isSignUpComplete) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('確認が完了しました。ログインしてください。')),
+        ShadSonner.of(context).show(
+          const ShadToast(title: Text('確認が完了しました。ログインしてください。')),
         );
         context.go('/login');
       }
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
+        ShadSonner.of(context).show(
+          ShadToast(title: Text(e.message)),
         );
       }
     } finally {
@@ -62,14 +62,14 @@ class _ConfirmSignupPageState extends ConsumerState<ConfirmSignupPage> {
     try {
       await Amplify.Auth.resendSignUpCode(username: widget.email);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('確認コードを再送しました')),
+        ShadSonner.of(context).show(
+          const ShadToast(title: Text('確認コードを再送しました')),
         );
       }
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
+        ShadSonner.of(context).show(
+          ShadToast(title: Text(e.message)),
         );
       }
     }

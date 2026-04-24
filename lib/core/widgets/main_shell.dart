@@ -127,8 +127,8 @@ class MainShell extends ConsumerWidget {
       await Amplify.Auth.signOut();
     } on AuthException catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
+        ShadSonner.of(context).show(
+          ShadToast(title: Text(e.message)),
         );
       }
     }
