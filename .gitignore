@@ -3,7 +3,9 @@
 *.log
 *.pyc
 *.swp
+*.swo
 .DS_Store
+Thumbs.db
 .atom/
 .build/
 .buildlog/
@@ -12,36 +14,59 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# IDE
+.idea/
+.vscode/
 *.iml
 *.ipr
 *.iws
-.idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-.vscode/
-
-# Flutter/Dart/Pub related
+# Flutter/Dart/Pub
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 /build/
 /coverage/
+build/
 
-# Symbolication related
-app.*.symbols
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
 
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
+# Android
+android/.gradle/
+android/local.properties
+android/*.keystore
 /android/app/debug
 /android/app/profile
 /android/app/release
-/.claude/*
-.gitignore
+
+# Symbolication / Obfuscation
+app.*.symbols
+app.*.map.json
+
+# 環境変数
+.env
+.env.local
+
+# Claude Code / ローカル作業用
+.claude/*
+.mcp.json
+.grepai/
+**/CLAUDE.md
+
+# ドキュメント（ローカル作業用・リポジトリには含めない）
+docs/
+
+# ログ
+logs/
+
+# 作業用スクリーンショット（README 用の images/NN_*.png は追跡対象）
+images/スクリーンショット*

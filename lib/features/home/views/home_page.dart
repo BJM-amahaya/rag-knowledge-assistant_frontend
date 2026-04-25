@@ -7,6 +7,7 @@ import 'package:rag_knowledge_assistant_frontend/features/home/widgets/quick_act
 import 'package:rag_knowledge_assistant_frontend/features/home/widgets/activity_card.dart';
 import 'package:rag_knowledge_assistant_frontend/features/home/widgets/date_header.dart';
 import 'package:rag_knowledge_assistant_frontend/features/home/widgets/empty_home_state.dart';
+import 'package:rag_knowledge_assistant_frontend/features/auth/providers/auth_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/documents/providers/document_provider.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/providers/task_provider.dart';
 
@@ -21,8 +22,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    // 初回データフェッチ
+    // 初回データフェッチ（未ログイン中は redirect 前の一瞬でも走らせない）
     Future.microtask(() {
+      if (!ref.read(authStateProvider).isSignedIn) return;
       ref.read(documentNotifierProvider.notifier).fetchDocuments();
       ref.read(taskNotifierProvider.notifier).fetchTasks();
     });

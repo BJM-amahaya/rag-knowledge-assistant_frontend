@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:rag_knowledge_assistant_frontend/core/config/env_config.dart';
 import 'package:rag_knowledge_assistant_frontend/features/tasks/models/agent_progress.dart';
@@ -154,7 +156,14 @@ class ApiWebSocketService implements WebSocketService {
     String taskId,
     String taskDescription,
   ) async* {
-    final uri = Uri.parse('${EnvConfig.wsBaseUrl}/ws/$taskId');
+    final session = await Amplify.Auth.fetchAuthSession();
+    final cognitoSession = session as CognitoAuthSession;
+    final token = cognitoSession.userPoolTokensResult.value.idToken.raw;
+
+    final uri = Uri.parse(
+      '${EnvConfig.wsBaseUrl}/ws/$taskId',
+    ).replace(queryParameters: {'token': token});
+
     _channel = WebSocketChannel.connect(uri);
 
     // start_task メッセージを送信
