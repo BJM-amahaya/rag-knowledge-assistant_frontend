@@ -1,13 +1,15 @@
 class AgentProgress {
   final String type; // "progress" or "complete"
   final Map<String, dynamic> data;
+  final String? taskId; // 本番(Lambda)のみ付与。ローカル(FastAPI)は null
 
-  AgentProgress({required this.type, required this.data});
+  AgentProgress({required this.type, required this.data, this.taskId});
 
   factory AgentProgress.fromJson(Map<String, dynamic> json) {
     return AgentProgress(
       type: json['type'] ?? '',
       data: json['data'] ?? {},
+      taskId: json['task_id'],
     );
   }
 

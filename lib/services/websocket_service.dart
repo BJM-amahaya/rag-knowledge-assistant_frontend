@@ -160,16 +160,22 @@ class ApiWebSocketService implements WebSocketService {
     final cognitoSession = session as CognitoAuthSession;
     final token = cognitoSession.userPoolTokensResult.value.idToken.raw;
 
-    final uri = Uri.parse(
-      '${EnvConfig.wsBaseUrl}/ws/$taskId',
-    ).replace(queryParameters: {'token': token});
+    // 環境に応じて接続先を切り替える
+    // ローカル: ws://localhost:8000/ws/{taskId}（認証なし・従来どおり）
+    // 本番:     wss://xxx/prod?token={JWT}（API Gateway + Lambda）
+    final uri = EnvConfig.isLocal
+        ? Uri.parse('${EnvConfig.wsBaseUrl}/ws/$taskId')
+        : Uri.parse('${EnvConfig.wsBaseUrl}/prod')
+            .replace(queryParameters: {'token': token});
 
     _channel = WebSocketChannel.connect(uri);
 
     // start_task メッセージを送信
+    // 本番は URL に task_id を入れられないため、メッセージに含める
     _channel!.sink.add(jsonEncode({
       'action': 'start_task',
       'task': taskDescription,
+      'task_id': taskId,
     }));
 
     // サーバーからの受信を yield

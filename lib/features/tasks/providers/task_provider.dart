@@ -61,6 +61,11 @@ class TaskNotifier extends StateNotifier<TaskState> {
     try {
       await for (final progress
           in _wsService.connect(taskId, taskDescription)) {
+        // task_id が付いていて、かつ自分のタスク以外なら無視する。
+        // （ローカル FastAPI は task_id を返さない＝null なので、その場合は従来通り通す）
+        if (progress.taskId != null && progress.taskId != taskId) {
+          continue;
+        }
         if (progress.type == 'progress') {
           final steps = [...state.progressSteps, progress];
           state = state.copyWith(
