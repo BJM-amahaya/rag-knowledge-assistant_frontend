@@ -11,4 +11,6 @@ class EnvConfig {
   );
   // モック用
   static const bool useMock = false;
+  // ローカル環境かどうかを判定（ws://localhost で始まれば true）
+  static bool get isLocal => wsBaseUrl.startsWith('ws://localhost');
 }
